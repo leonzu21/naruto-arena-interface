@@ -166,6 +166,8 @@ class NarutoArenaBot:
                 chakra = players[0]["chakra"]
                 battle_info = self.wait_for_turn(turn, players[0]["playerId"])
 
+                print(battle_info)
+
                 self.print_battle_info(my_chars, opponent_chars, chakra)
 
                 print("\nIt's your turn!")
@@ -301,10 +303,11 @@ class NarutoArenaBot:
                 res.status_code == 200
                 and res.headers.get("Content-Type") == "application/json; charset=utf-8"
             ):
-                current_turn = my_player_id
-                return res.json()
-            else:
-                self.loading_service.print_loading("Waiting for your turn...")
+                if res.json() == {"message": "complete"}:
+                    self.loading_service.print_loading("Waiting for your turn...")
+                else:
+                    current_turn = my_player_id
+                    return res.json()
 
         return None
 
