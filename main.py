@@ -201,7 +201,7 @@ class NarutoArenaBot:
                 go_again = input("Do you want to search for another game? (y/n): ")
 
                 if go_again == "y":
-                    self.run("leonzu")
+                    self.run(getattr(self, "player_id", "leonzu"))
                 else:
                     print("Goodbye!")
 
@@ -238,42 +238,53 @@ class NarutoArenaBot:
             char_used = input("Choose a character (Press Enter to end turn): ")
 
             if char_used != "":
-                print_character_skills(my_chars[int(char_used)])
+                if not char_used.isdigit() or int(char_used) not in range(len(my_chars)):
+                    print("Invalid character index.")
+                    continue
+                char_idx = int(char_used)
+                print_character_skills(my_chars[char_idx])
                 skill_used = input("Choose a skill: ")
 
                 if skill_used != "":
+                    if not skill_used.isdigit() or int(skill_used) not in range(len(my_chars[char_idx]["skills"])):
+                        print("Invalid skill index.")
+                        continue
+                    skill_idx = int(skill_used)
                     print_my_characters()
                     print_opponent_characters()
                     target = input("Choose a target: ")
 
                     if target != "":
+                        if not target.isdigit() or int(target) not in range(len(opponent_chars) + len(my_chars)):
+                            print("Invalid target index.")
+                            continue
+                        target_val = int(target)
                         side = 0
-                        if int(target) > 2:
+                        if target_val > 2:
                             side = 1
-                            target = int(target) - 3
+                            target_val -= 3
                         queue.append(
                             {
-                                "name": my_chars[int(char_used)]["skills"][
-                                    int(skill_used)
-                                ]["name"],
-                                "menu_local": [0, int(char_used), int(skill_used)],
+                                "name": my_chars[char_idx]["skills"][skill_idx]["name"],
+                                "menu_local": [0, char_idx, skill_idx],
                                 "side": 0,
-                                "index": int(char_used),
-                                "usedOn": {"s": side, "i": int(target)},
+                                "index": char_idx,
+                                "usedOn": {"s": side, "i": target_val},
                                 "new": True,
                             }
                         )
-                        skill_energy = my_chars[int(char_used)]["skills"][
-                            int(skill_used)
-                        ]["energy"]
+                        skill_energy = my_chars[char_idx]["skills"][skill_idx]["energy"]
                         for energy in skill_energy:
                             if energy in chakra:
                                 chakra.remove(energy)
                         random_count = skill_energy.count("Random")
-                        for i in range(random_count):
+                        for _ in range(random_count):
                             print(f"Chakra: {chakra}")
                             chakra_used = input("Choose a chakra to spend: ")
                             if chakra_used != "":
+                                if not chakra_used.isdigit() or int(chakra_used) not in range(len(chakra)):
+                                    print("Invalid chakra index.")
+                                    continue
                                 removedChakra.append(chakra[int(chakra_used)])
                                 chakra.pop(int(chakra_used))
 
@@ -321,6 +332,7 @@ class NarutoArenaBot:
         return user_input == "2"
 
     def run(self, player_id: str):
+        self.player_id = player_id
         res_search_game = self.handle_search_game(player_id, self.team)
         if res_search_game.status_code == 200:
             self.loading_service.print_message("Searching for a game...")
