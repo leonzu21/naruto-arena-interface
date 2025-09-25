@@ -160,3 +160,7 @@ cython_debug/
 #.idea/
 
 token.txt
+
+# IDE and editor files
+.vscode/
+.idea/

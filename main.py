@@ -7,6 +7,7 @@ import os
 
 TOKEN_FILE = "token.txt"
 
+
 class LoadingService:
     def __init__(self):
         self.loading_symbols = ["|", "/", "-", "\\"]
@@ -40,7 +41,7 @@ class NarutoArenaBot:
         "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
     }
 
-    TEAM = ["Uchiha Sasuke", "Uzumaki Naruto", "Kin Tsuchi"]
+    TEAM = ["Haruno Sakura", "Rock Lee", "Kin Tsuchi"]
 
     def __init__(self):
         self.token = self.get_token()
@@ -149,8 +150,10 @@ class NarutoArenaBot:
             html = res.text
             script_contents = self.get_script_contents(html)
             try:
-                battle_state = script_contents["props"]["pageProps"]["serverBattleResponse"]["battleState"]
-            
+                battle_state = script_contents["props"]["pageProps"][
+                    "serverBattleResponse"
+                ]["battleState"]
+
                 turn = battle_state["turn"]
                 players = battle_state["players"]
                 my_chars = [
@@ -165,8 +168,6 @@ class NarutoArenaBot:
                 ]
                 chakra = players[0]["chakra"]
                 battle_info = self.wait_for_turn(turn, players[0]["playerId"])
-
-                print(battle_info)
 
                 self.print_battle_info(my_chars, opponent_chars, chakra)
 
